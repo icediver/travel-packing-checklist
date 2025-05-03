@@ -1,45 +1,146 @@
-import { Tabs } from 'expo-router';
-import React from 'react';
-import { Platform } from 'react-native';
+import { Tabs } from "expo-router";
+import { View } from "react-native";
 
-import { HapticTab } from '@/components/HapticTab';
-import { IconSymbol } from '@/components/ui/IconSymbol';
-import TabBarBackground from '@/components/ui/TabBarBackground';
-import { Colors } from '@/constants/Colors';
-import { useColorScheme } from '@/hooks/useColorScheme';
+import { Ionicons } from "@expo/vector-icons";
+import { AddTaskButton } from "@/components/ui/buttons/AddTaskButton";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useState } from "react";
+import { AddItemModal } from "@/components/ui/add-item-modal/AddItemModal";
+import { useSQLiteContext } from "expo-sqlite";
+import { useDrizzleStudio } from "expo-drizzle-studio-plugin";
+import { Badge } from "@/components/ui/badge/Badge";
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
+  const [isShow, setIsShow] = useState(false);
+  const inset = useSafeAreaInsets();
+  const db = useSQLiteContext();
+  //TODO: remove;
+  useDrizzleStudio(db);
+  //
 
   return (
-    <Tabs
-      screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-        headerShown: false,
-        tabBarButton: HapticTab,
-        tabBarBackground: TabBarBackground,
-        tabBarStyle: Platform.select({
-          ios: {
-            // Use a transparent background on iOS to show the blur effect
-            position: 'absolute',
+    <View
+      style={{
+        paddingTop: inset.top,
+        flex: 1,
+      }}
+    >
+      <Tabs
+        screenOptions={{
+          //tabBarActiveTintColor: "#998beb",
+          //headerShown: false,
+          //tabBarButton: HapticTab,
+          //tabBarBackground: TabBarBackground,
+          //headerStyle: {
+          //backgroundColor: "#0A0C1C",
+          //margin: -inset.top,
+          //height: 40,
+          //backgroundColor: COLORS.dangerButton,
+          //},
+          //headerTitleAlign: "center",
+          //headerTitleContainerStyle: {
+          //flex: 1,
+          //height: 40,
+          //justifyContent: "center",
+          //alignItems: "center",
+          //marginTop: -inset.top,
+          //},
+          //headerTitleStyle: {
+          //color: "white",
+          //},
+          headerShown: false,
+
+          tabBarStyle: {
+            backgroundColor: "#0A0C1C",
+            height: 60,
+            position: "absolute",
+            zIndex: 100,
+            borderTopWidth: 0,
           },
-          default: {},
-        }),
-      }}>
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
         }}
-      />
-      <Tabs.Screen
-        name="explore"
-        options={{
-          title: 'Explore',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
-        }}
-      />
-    </Tabs>
+      >
+        <Tabs.Screen
+          name="(home)"
+          options={{
+            title: "Home",
+            tabBarIcon: ({ color }) => (
+              <Ionicons
+                size={28}
+                name="home"
+                color={color}
+              />
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="calendar"
+          options={{
+            title: "Calendar",
+            tabBarIcon: ({ color }) => (
+              <Ionicons
+                size={28}
+                name="calendar"
+                color={color}
+                style={{ right: 3 }}
+              />
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="create"
+          options={{
+            tabBarLabelStyle: { display: "none" },
+
+            tabBarIcon: ({ color }) => (
+              <AddTaskButton
+                icon="add"
+                variant="secondary"
+                onPress={(e) => {
+                  e.preventDefault();
+                  //router.push("/create/modal");
+                  setIsShow(!isShow);
+                }}
+              />
+            ),
+          }}
+          listeners={({ navigation }) => ({
+            tabPress: (e) => {
+              e.preventDefault();
+              navigation.navigate("create");
+            },
+          })}
+        />
+        <Tabs.Screen
+          name="notifications"
+          options={{
+            title: "notify",
+            tabBarIcon: ({ color }) => (
+              <View>
+                <Badge />
+                <Ionicons
+                  size={28}
+                  name="notifications"
+                  color={color}
+                />
+              </View>
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="profile"
+          options={{
+            title: "Profile",
+            tabBarIcon: ({ color }) => (
+              <Ionicons
+                size={28}
+                name="person"
+                color={color}
+              />
+            ),
+          }}
+        />
+      </Tabs>
+      {isShow && <AddItemModal closeModal={() => setIsShow(false)} />}
+    </View>
   );
 }

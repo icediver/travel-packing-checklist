@@ -1,0 +1,42 @@
+import { COLORS } from "@/constants/colors.constants";
+import * as schema from "@/db/schema";
+import { useQuery } from "@tanstack/react-query";
+import { drizzle } from "drizzle-orm/expo-sqlite";
+import { useSQLiteContext } from "expo-sqlite";
+import { Text, TouchableOpacity, FlatList } from "react-native";
+import { ModalContainer } from "../modals/ModalContainer";
+import { useModalStore } from "@/store/use-close-modal";
+import { ListCheckboxItem } from "./add-event/list-checkbox-item/ListCheckboxItem";
+import { useLists } from "@/hooks/data-base/useList";
+
+interface Props {
+  value: number;
+  onChange: (item: number) => void;
+}
+
+export function ModalListChoice({ onChange, value }: Props) {
+  const { data: lists } = useLists();
+  const { toggleModal } = useModalStore();
+
+  return (
+    <ModalContainer
+      variant="withPlusIcon"
+      //triggerTitle={"Select date"}
+    >
+      <>
+        <FlatList
+          data={lists}
+          keyExtractor={(item, index) => index.toString()}
+          renderItem={({ item }) => <ListCheckboxItem list={item} />}
+        />
+        <TouchableOpacity
+          style={{ backgroundColor: COLORS.dangerButton }}
+          onPress={toggleModal}
+          className="mt-2.5 p-2.5 rounded-md"
+        >
+          <Text className="text-center text-white text-lg">Close</Text>
+        </TouchableOpacity>
+      </>
+    </ModalContainer>
+  );
+}

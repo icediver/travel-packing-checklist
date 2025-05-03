@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "checklist-calendar",
-    "slug": "checklist-calendar",
+    "name": "travel-packing-checklist",
+    "slug": "travel-packing-checklist",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -30,7 +30,7 @@
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 200,
           "resizeMode": "contain",
-          "backgroundColor": "#ffffff"
+          "backgroundColor": "#000000"
         }
       ]
     ],

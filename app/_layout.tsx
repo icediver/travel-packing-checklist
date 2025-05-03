@@ -1,21 +1,34 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
-import * as SplashScreen from 'expo-splash-screen';
-import { StatusBar } from 'expo-status-bar';
-import { useEffect } from 'react';
-import 'react-native-reanimated';
+import { SplashScreen, Stack } from "expo-router";
+import * as SQLite from "expo-sqlite";
 
-import { useColorScheme } from '@/hooks/useColorScheme';
+import { ActivityIndicator, Text, View } from "react-native";
+import { SQLiteProvider } from "expo-sqlite";
+import { drizzle } from "drizzle-orm/expo-sqlite";
+import { useMigrations } from "drizzle-orm/expo-sqlite/migrator";
+import migrations from "@/drizzle/migrations";
+import { Suspense, useEffect } from "react";
+import "../assets/styles/global.css";
+import {
+  SafeAreaProvider,
+  initialWindowMetrics,
+} from "react-native-safe-area-context";
+import { StatusBar } from "expo-status-bar";
+import { useFonts } from "expo-font";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { seeds } from "@/db/seeds";
+import { useDrizzleStudio } from "expo-drizzle-studio-plugin";
 
-// Prevent the splash screen from auto-hiding before asset loading is complete.
-SplashScreen.preventAutoHideAsync();
+export const DATABASE_NAME = "db.db";
+const expo = SQLite.openDatabaseSync(DATABASE_NAME);
+const db = drizzle(expo);
+
+const queryClient = new QueryClient();
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
   const [loaded] = useFonts({
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
+    SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
   });
+  const { success, error } = useMigrations(db, migrations);
 
   useEffect(() => {
     if (loaded) {
@@ -27,13 +40,63 @@ export default function RootLayout() {
     return null;
   }
 
+  //useEffect(() => {
+  //  if (!success) return;
+  //  seeds(db);
+  //}, [success]);
+
+  if (error) {
+    return (
+      <View>
+        <Text>Migration error: {error.message}</Text>
+      </View>
+    );
+  }
+  if (!success) {
+    return (
+      <View>
+        <Text>Migration is in progress...</Text>
+      </View>
+    );
+  }
+
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="+not-found" />
-      </Stack>
-      <StatusBar style="auto" />
-    </ThemeProvider>
+    <>
+      <QueryClientProvider client={queryClient}>
+        <SafeAreaProvider initialMetrics={initialWindowMetrics}>
+          <Suspense fallback={<ActivityIndicator size="large" />}>
+            <SQLiteProvider
+              databaseName={DATABASE_NAME}
+              options={{ enableChangeListener: true }}
+              useSuspense
+            >
+              <StatusBar style="light" />
+              <Stack
+                screenOptions={{
+                  contentStyle: {
+                    //paddingTop: inset.top,
+                    backgroundColor: "black",
+                  },
+                  //headerBackButtonDisplayMode: "minimal",
+                  //headerTransparent: true,
+                }}
+              >
+                <Stack.Screen
+                  name="(tabs)"
+                  options={{
+                    headerShown: false,
+                    presentation: "modal",
+                    //headerBackVisible: false,
+                    //headerBackButtonDisplayMode: "minimal",
+                  }}
+                />
+
+                <Stack.Screen name="+not-found" />
+              </Stack>
+            </SQLiteProvider>
+          </Suspense>
+        </SafeAreaProvider>
+      </QueryClientProvider>
+    </>
   );
 }
