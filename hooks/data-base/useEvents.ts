@@ -36,10 +36,8 @@ export function useEventByDate(date: string) {
     queryFn: async () => {
       const dateEvent = await db.query.dates.findFirst({
         where: eq(dates.date, date),
-        //with: {
-        //  lists: true,
-        //},
       });
+
       if (!dateEvent) throw new Error("Date not found");
 
       const result = await db.query.events.findMany({
@@ -52,6 +50,8 @@ export function useEventByDate(date: string) {
           },
         },
       });
+
+      if (!result) throw new Error("Event not found");
 
       return result;
     },
