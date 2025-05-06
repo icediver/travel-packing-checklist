@@ -9,11 +9,11 @@ import { ExpoSQLiteDatabase } from "drizzle-orm/expo-sqlite";
 
 //Get all events
 export function useCompletedTasks() {
-  const { drizzleDb } = useDatabase();
+  const { db } = useDatabase();
   return useQuery({
     queryKey: ["completed-tasks"],
     queryFn: async () => {
-      const data = await drizzleDb.query.completedTasks.findMany({
+      const data = await db.query.completedTasks.findMany({
         with: {
           date: true,
           list: {
@@ -31,18 +31,18 @@ export function useCompletedTasks() {
 //Get completed tasks by Date
 
 export function useCompletedTasksByDate(date: string) {
-  const { drizzleDb } = useDatabase();
+  const { db } = useDatabase();
 
   return useQuery({
     queryKey: ["completed-tasks", date],
     queryFn: async () => {
-      const data = await drizzleDb.query.dates.findFirst({
+      const data = await db.query.dates.findFirst({
         where: eq(dates.date, date),
       });
 
       if (!data) throw new Error("Date not found");
 
-      const result = await drizzleDb.query.completedTasks.findMany({
+      const result = await db.query.completedTasks.findMany({
         where: eq(completedTasks.dateId, data.id),
         with: {
           date: true,
@@ -69,12 +69,12 @@ export function useCompletedTask({
   dateId: number;
   listId: number;
 }) {
-  const { drizzleDb } = useDatabase();
+  const { db } = useDatabase();
 
   return useQuery({
     queryKey: ["completed-tasks", taskId, dateId, listId],
     queryFn: async () => {
-      const data = await drizzleDb.query.completedTasks.findFirst({
+      const data = await db.query.completedTasks.findFirst({
         where: and(
           eq(completedTasks.taskId, taskId),
           eq(completedTasks.dateId, dateId),
@@ -91,7 +91,7 @@ export function useCompletedTask({
 //Insert comleted task  mutation
 
 export function useAddCompletedTask() {
-  const { drizzleDb, queryClient } = useDatabase();
+  const { db, queryClient } = useDatabase();
 
   const createDate = useMutation({
     mutationFn: async ({
@@ -103,7 +103,7 @@ export function useAddCompletedTask() {
       listId: number;
       taskId: number;
     }) => {
-      await drizzleDb
+      await db
         .insert(completedTasks)
         .values({ taskId, listId, dateId })
         .returning();
@@ -120,7 +120,7 @@ export function useAddCompletedTask() {
 //Delete completed task
 
 export function useDeleteCompletedTask() {
-  const { drizzleDb, queryClient } = useDatabase();
+  const { db, queryClient } = useDatabase();
   return useMutation({
     mutationFn: async ({
       date,
@@ -131,7 +131,7 @@ export function useDeleteCompletedTask() {
       listId: number;
       taskId: number;
     }) => {
-      await drizzleDb
+      await db
         .delete(completedTasks)
         .where(
           and(

@@ -8,8 +8,4 @@ export const dates = sqliteTable("dates", {
   date: text("date").notNull().unique(),
 });
 
-export const datesRelations = relations(dates, ({ many }) => ({
-  lists: many(events),
-}));
-
 export type DateType = typeof dates.$inferSelect;

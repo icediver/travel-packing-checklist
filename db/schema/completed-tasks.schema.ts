@@ -22,19 +22,4 @@ export const completedTasks = sqliteTable(
   (t) => [primaryKey({ columns: [t.taskId, t.listId, t.dateId] })],
 );
 
-export const completedTasksRelations = relations(completedTasks, ({ one }) => ({
-  task: one(tasks, {
-    fields: [completedTasks.taskId],
-    references: [tasks.id],
-  }),
-  list: one(lists, {
-    fields: [completedTasks.listId],
-    references: [lists.id],
-  }),
-  date: one(dates, {
-    fields: [completedTasks.dateId],
-    references: [dates.id],
-  }),
-}));
-
 export type CompletedTasksType = typeof completedTasks.$inferSelect;

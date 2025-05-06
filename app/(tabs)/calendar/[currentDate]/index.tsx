@@ -11,6 +11,7 @@ export default function CalendarScreen() {
   const { data: dates } = useDates();
 
   const event = dates?.find((item) => item.date === date);
+
   if (!event) return <Text>Something went wrong!</Text>;
 
   const { data, isLoading, isError } = useEventByDate(date);

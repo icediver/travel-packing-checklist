@@ -5,15 +5,8 @@
     {
       "idx": 0,
       "version": "6",
-      "when": 1746094262564,
-      "tag": "0000_complex_proudstar",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "6",
-      "when": 1746265540369,
-      "tag": "0001_robust_bastion",
+      "when": 1746433489823,
+      "tag": "0000_short_sue_storm",
       "breakpoints": true
     }
   ]

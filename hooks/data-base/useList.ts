@@ -3,14 +3,15 @@ import { eq, sql } from "drizzle-orm";
 import { useDatabase } from "./useDatabase";
 import { lists, ListType } from "@/db/schema/lists.schema";
 import { TaskType, tasks } from "@/db/schema/tasks.schema";
+import { useSeeds } from "./useSeeds";
 
 //Get all lists
 export function useLists() {
-  const { drizzleDb } = useDatabase();
+  const { db } = useDatabase();
   return useQuery({
     queryKey: ["lists"],
     queryFn: async () => {
-      const data = await drizzleDb.query.lists.findMany();
+      const data = await db.query.lists.findMany();
       return data;
     },
   });
@@ -19,13 +20,13 @@ export function useLists() {
 //Get list by id
 
 export function useList(id: number) {
-  const { drizzleDb } = useDatabase();
+  const { db } = useDatabase();
 
   return useQuery({
     queryKey: ["lists", id],
     queryFn: async () => {
       //const data: { lists: ListType; tasks: TaskType | null }[] =
-      //  await drizzleDb
+      //  await db
       //    .select()
       //    .from(lists)
       //    .where(eq(lists.id, id))
@@ -45,14 +46,18 @@ export function useList(id: number) {
       //  tasks: modifiedTasks,
       //};
 
-      const result = await drizzleDb.query.lists.findFirst({
+      const result = await db.query.lists.findFirst({
         where: eq(lists.id, id),
         with: {
           tasks: {
-            orderBy: tasks.id,
+            orderBy: (tasks, { asc }) => [asc(tasks.id)],
           },
         },
       });
+
+      if (!result) {
+        throw new Error("List not found");
+      }
 
       return result;
     },
@@ -62,10 +67,14 @@ export function useList(id: number) {
 //Create list mutation
 
 export function useCreateList() {
-  const { drizzleDb, queryClient } = useDatabase();
+  const { db, queryClient } = useDatabase();
   return useMutation({
     mutationFn: async (list: Omit<ListType, "id">) => {
-      const [newList] = await drizzleDb.insert(lists).values(list).returning();
+      const [newList] = await db.insert(lists).values(list).returning();
+
+      if (!newList) {
+        throw new Error("Failed to create list");
+      }
 
       return newList;
     },
@@ -73,38 +82,54 @@ export function useCreateList() {
       // Invalidate and refetch
       queryClient.invalidateQueries({ queryKey: ["lists"] });
     },
+    onError: (error) => {
+      console.error("Create list error:", error);
+    },
   });
 }
 
 // Update list mutation
 
 export function useUpdateList() {
-  const { drizzleDb, queryClient } = useDatabase();
+  const { db, queryClient } = useDatabase();
+
   return useMutation({
     mutationFn: async ({ id, ...data }: ListType) => {
-      const [updatedList] = await drizzleDb
+      const [updatedList] = await db
         .update(lists)
         .set(data)
         .where(eq(lists.id, id))
         .returning();
+
+      if (!updatedList) {
+        throw new Error("Failed to update list");
+      }
+
       return updatedList;
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["lists"] });
       queryClient.invalidateQueries({ queryKey: ["lists", data.id] });
     },
+    onError: (error) => {
+      console.error("Update list error:", error);
+    },
   });
 }
 
 export function useDeleteList() {
-  const { drizzleDb, queryClient } = useDatabase();
+  const { db, queryClient } = useDatabase();
 
   return useMutation({
     mutationFn: async (id: number) => {
-      await drizzleDb.delete(lists).where(eq(lists.id, id));
+      await db.delete(lists).where(eq(lists.id, id));
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["lists"] });
+    },
+
+    onError: (error) => {
+      console.error("Delete list error:", error);
     },
   });
 }

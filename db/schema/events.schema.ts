@@ -16,16 +16,4 @@ export const events = sqliteTable(
   (t) => [primaryKey({ columns: [t.listId, t.dateId] })],
 );
 
-export const eventsRelations = relations(events, ({ one, many }) => ({
-  list: one(lists, {
-    fields: [events.listId],
-    references: [lists.id],
-  }),
-  date: one(dates, {
-    fields: [events.dateId],
-    references: [dates.id],
-  }),
-  tasks: many(events),
-}));
-
 export type EventType = typeof events.$inferSelect;

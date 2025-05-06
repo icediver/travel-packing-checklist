@@ -9,9 +9,4 @@ export const lists = sqliteTable("lists", {
   name: text("name").notNull(),
 });
 
-export const listsRelations = relations(lists, ({ many }) => ({
-  tasks: many(tasks),
-  dates: many(dates),
-  listDates: many(events),
-}));
 export type ListType = typeof lists.$inferSelect;

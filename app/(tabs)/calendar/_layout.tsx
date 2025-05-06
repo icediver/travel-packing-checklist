@@ -31,7 +31,7 @@ export default function CalendarLayout() {
         }}
       >
         <Stack.Screen
-          name="calendar"
+          name="index"
           options={{ title: "Calendar" }}
         />
       </Stack>

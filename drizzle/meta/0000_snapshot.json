@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "1b4d8c89-cc25-468d-9111-61add284655c",
+  "id": "900f1975-3469-4512-9e07-e8ffe09c6d75",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "completed_tasks": {
@@ -229,14 +229,6 @@
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
-        },
-        "checked": {
-          "name": "checked",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": 0
         },
         "list_id": {
           "name": "list_id",

@@ -15,19 +15,23 @@ import {
 import { StatusBar } from "expo-status-bar";
 import { useFonts } from "expo-font";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { seeds } from "@/db/seeds";
 import { useDrizzleStudio } from "expo-drizzle-studio-plugin";
+import { ClickOutsideProvider } from "react-native-click-outside";
 
 export const DATABASE_NAME = "db.db";
+
 const expo = SQLite.openDatabaseSync(DATABASE_NAME);
 const db = drizzle(expo);
 
 const queryClient = new QueryClient();
 
 export default function RootLayout() {
+  useDrizzleStudio(expo);
+
   const [loaded] = useFonts({
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
   });
+
   const { success, error } = useMigrations(db, migrations);
 
   useEffect(() => {
@@ -39,11 +43,6 @@ export default function RootLayout() {
   if (!loaded) {
     return null;
   }
-
-  //useEffect(() => {
-  //  if (!success) return;
-  //  seeds(db);
-  //}, [success]);
 
   if (error) {
     return (
@@ -62,41 +61,43 @@ export default function RootLayout() {
 
   return (
     <>
-      <QueryClientProvider client={queryClient}>
-        <SafeAreaProvider initialMetrics={initialWindowMetrics}>
-          <Suspense fallback={<ActivityIndicator size="large" />}>
-            <SQLiteProvider
-              databaseName={DATABASE_NAME}
-              options={{ enableChangeListener: true }}
-              useSuspense
-            >
-              <StatusBar style="light" />
-              <Stack
-                screenOptions={{
-                  contentStyle: {
-                    //paddingTop: inset.top,
-                    backgroundColor: "black",
-                  },
-                  //headerBackButtonDisplayMode: "minimal",
-                  //headerTransparent: true,
-                }}
+      <ClickOutsideProvider>
+        <QueryClientProvider client={queryClient}>
+          <SafeAreaProvider initialMetrics={initialWindowMetrics}>
+            <Suspense fallback={<ActivityIndicator size="large" />}>
+              <SQLiteProvider
+                databaseName={DATABASE_NAME}
+                options={{ enableChangeListener: true }}
+                useSuspense
               >
-                <Stack.Screen
-                  name="(tabs)"
-                  options={{
-                    headerShown: false,
-                    presentation: "modal",
-                    //headerBackVisible: false,
+                <StatusBar style="light" />
+                <Stack
+                  screenOptions={{
+                    contentStyle: {
+                      //paddingTop: inset.top,
+                      backgroundColor: "black",
+                    },
                     //headerBackButtonDisplayMode: "minimal",
+                    //headerTransparent: true,
                   }}
-                />
+                >
+                  <Stack.Screen
+                    name="(tabs)"
+                    options={{
+                      headerShown: false,
+                      presentation: "modal",
+                      //headerBackVisible: false,
+                      //headerBackButtonDisplayMode: "minimal",
+                    }}
+                  />
 
-                <Stack.Screen name="+not-found" />
-              </Stack>
-            </SQLiteProvider>
-          </Suspense>
-        </SafeAreaProvider>
-      </QueryClientProvider>
+                  <Stack.Screen name="+not-found" />
+                </Stack>
+              </SQLiteProvider>
+            </Suspense>
+          </SafeAreaProvider>
+        </QueryClientProvider>
+      </ClickOutsideProvider>
     </>
   );
 }

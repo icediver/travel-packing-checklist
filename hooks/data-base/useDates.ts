@@ -5,11 +5,11 @@ import { useDatabase } from "./useDatabase";
 
 //Get all dates
 export function useDates() {
-  const { drizzleDb } = useDatabase();
+  const { db } = useDatabase();
   return useQuery({
     queryKey: ["dates"],
     queryFn: async () => {
-      const data = await drizzleDb.query.dates.findMany();
+      const data = await db.query.dates.findMany();
       return data;
     },
   });
@@ -18,11 +18,11 @@ export function useDates() {
 //Get date by id
 
 export function useDateById(id: number) {
-  const { drizzleDb } = useDatabase();
+  const { db } = useDatabase();
   return useQuery({
     queryKey: ["dates", id],
     queryFn: async () => {
-      const data = await drizzleDb
+      const data = await db
         .select()
         .from(dates)
         .where(eq(dates.id, id))
@@ -38,15 +38,15 @@ export function useDateById(id: number) {
 //Get date by date
 
 export function useDateByDate(date: string) {
-  const { drizzleDb } = useDatabase();
+  const { db } = useDatabase();
   return useQuery({
     queryKey: ["dates", date],
     queryFn: async () => {
-      const data = await drizzleDb.query.dates.findFirst({
+      const data = await db.query.dates.findFirst({
         where: eq(dates.date, date),
-        with: {
-          lists: true,
-        },
+        //with: {
+        //  lists: true,
+        //},
       });
       if (!data) throw new Error("Date not found");
       return data;
@@ -58,12 +58,12 @@ export function useDateByDate(date: string) {
 // Get date by range
 //
 export function useDatesByRange(startDate: string, endDate: string) {
-  const { drizzleDb } = useDatabase();
+  const { db } = useDatabase();
 
   return useQuery({
     queryKey: ["dates-in-range"],
     queryFn: async () => {
-      const result = await drizzleDb
+      const result = await db
         .select()
         .from(dates)
         .where(
@@ -78,11 +78,11 @@ export function useDatesByRange(startDate: string, endDate: string) {
 //Create date mutation
 
 export function useCreateDate() {
-  const { drizzleDb, queryClient } = useDatabase();
+  const { db, queryClient } = useDatabase();
 
   const createDate = useMutation({
     mutationFn: async ({ date, title }: DateType) => {
-      const [newDate] = await drizzleDb
+      const [newDate] = await db
         .insert(dates)
         .values({ date, title })
         .returning();
@@ -104,10 +104,10 @@ export function useCreateDate() {
 // Update date mutation
 
 export function useUpdateDate() {
-  const { drizzleDb, queryClient } = useDatabase();
+  const { db, queryClient } = useDatabase();
   return useMutation({
     mutationFn: async ({ id, ...data }: DateType) => {
-      const [updatedDate] = await drizzleDb
+      const [updatedDate] = await db
         .update(dates)
         .set(data)
         .where(eq(dates.id, id))
@@ -122,11 +122,11 @@ export function useUpdateDate() {
 }
 
 export function useDeleteDate() {
-  const { drizzleDb, queryClient } = useDatabase();
+  const { db, queryClient } = useDatabase();
 
   return useMutation({
     mutationFn: async (id: number) => {
-      await drizzleDb.delete(dates).where(eq(dates.id, id));
+      await db.delete(dates).where(eq(dates.id, id));
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["dates"] });
@@ -135,11 +135,11 @@ export function useDeleteDate() {
 }
 
 export function useDeleteDateByDate() {
-  const { drizzleDb, queryClient } = useDatabase();
+  const { db, queryClient } = useDatabase();
 
   return useMutation({
     mutationFn: async (date: string) => {
-      await drizzleDb.delete(dates).where(eq(dates.date, date));
+      await db.delete(dates).where(eq(dates.date, date));
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["dates"] });

@@ -11,6 +11,7 @@ import {
 } from "@/hooks/data-base/useDates";
 import { CalendarSubbase } from "@/components/ui/calendar/CalendarSubbase";
 import { AddEventModal } from "@/components/ui/modals/modal-choice-date/AddEventModal";
+import { generateBoxShadowStyle } from "@/lib/shadow.utils";
 
 export default function Index() {
   const [key, setKey] = useState(0);
@@ -83,11 +84,18 @@ export default function Index() {
         entering={SlideInDown}
         className="items-center justify-start bg-slate-900 h-full w-full px-8"
       >
-        <View className="w-full  rounded-2xl overflow-hidden relative mt-8">
-          {/*
-          <View className="w-full h-full p-4 bg-violet-400/20  absolute " />
-*/}
-          <CalendarSubbase className="w-full h-full  absolute " />
+        <View
+          className="w-full    relative mt-8 rounded-2xl bg-indigo-950"
+          style={{
+            ...generateBoxShadowStyle({
+              shadowColorAndroid: "rgba(224,217,255,0.3);",
+              shadowOpacity: 0.01,
+              shadowRadius: 3.84,
+              elevation: 20,
+            }),
+          }}
+        >
+          <CalendarSubbase className="w-full h-full  absolute rounded-2xl" />
           {/*<BlurView
             intensity={200}
             tint="dark"
@@ -96,8 +104,8 @@ export default function Index() {
           <Calendar
             style={{
               width: "100%",
-              color: "white",
-              selfAlign: "center",
+              //color: "white",
+              //selfAlign: "center",
               flexGrow: 1,
               borderRadius: 8,
               overflow: "hidden",

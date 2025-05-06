@@ -9,14 +9,17 @@ import { AddItemModal } from "@/components/ui/add-item-modal/AddItemModal";
 import { useSQLiteContext } from "expo-sqlite";
 import { useDrizzleStudio } from "expo-drizzle-studio-plugin";
 import { Badge } from "@/components/ui/badge/Badge";
+import { useFirstLaunch } from "@/hooks/data-base/useFirstLaunch";
+import { useSeeds } from "@/hooks/data-base/useSeeds";
 
 export default function TabLayout() {
   const [isShow, setIsShow] = useState(false);
   const inset = useSafeAreaInsets();
   const db = useSQLiteContext();
-  //TODO: remove;
+
+  useSeeds();
+
   useDrizzleStudio(db);
-  //
 
   return (
     <View

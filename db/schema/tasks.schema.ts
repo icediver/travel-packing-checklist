@@ -1,6 +1,7 @@
 import { int, sqliteTable, text } from "drizzle-orm/sqlite-core";
 import { lists } from "./lists.schema";
 import { relations } from "drizzle-orm";
+import { completedTasks } from "./completed-tasks.schema";
 
 export const tasks = sqliteTable("tasks", {
   id: int().primaryKey({ autoIncrement: true }),
@@ -10,14 +11,6 @@ export const tasks = sqliteTable("tasks", {
     .notNull()
     .references(() => lists.id),
 });
-
-export const tasksRelations = relations(tasks, ({ one, many }) => ({
-  list: one(lists, {
-    fields: [tasks.listId],
-    references: [lists.id],
-  }),
-  tasks: many(tasks),
-}));
 
 //export default tasks;
 

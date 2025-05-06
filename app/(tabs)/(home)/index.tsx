@@ -1,4 +1,4 @@
-import { FlatList, Text, View } from "react-native";
+import { FlatList, Modal, Pressable, Text, View } from "react-native";
 import { useRouter } from "expo-router";
 import {
   useCreateList,
@@ -9,8 +9,10 @@ import {
 import { ListItem } from "@/components/ui/list/ListItem";
 import { AddListModal } from "@/components/ui/forms/AddListModal";
 import { LoaderComponent } from "@/components/ui/loader/Loader";
+import { useState } from "react";
 
 export default function ListsPage() {
+  const [isShaking, setIsShaking] = useState(true);
   const { data, isLoading, isError } = useLists();
   const { mutate: create } = useCreateList();
   const { mutate: update } = useUpdateList();

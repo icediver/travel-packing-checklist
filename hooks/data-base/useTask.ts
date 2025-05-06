@@ -4,13 +4,13 @@ import { useDatabase } from "./useDatabase";
 import { tasks, TaskType } from "@/db/schema/tasks.schema";
 
 export function useTasks() {
-  const { drizzleDb } = useDatabase();
+  const { db } = useDatabase();
 
   // Fetch Tasks
   return useQuery({
     queryKey: ["tasks"],
     queryFn: async () => {
-      const data = await drizzleDb.query.tasks.findMany();
+      const data = await db.query.tasks.findMany();
       return data;
     },
   });
@@ -18,15 +18,12 @@ export function useTasks() {
 
 // Get Task by ID
 export function useTask(id: number) {
-  const { drizzleDb } = useDatabase();
+  const { db } = useDatabase();
 
   return useQuery({
     queryKey: ["tasks", id],
     queryFn: async () => {
-      const [task] = await drizzleDb
-        .select()
-        .from(tasks)
-        .where(eq(tasks.id, id));
+      const [task] = await db.select().from(tasks).where(eq(tasks.id, id));
       return task;
     },
     enabled: !!id,
@@ -35,10 +32,10 @@ export function useTask(id: number) {
 
 //Create Task mutation
 export function useCreateTask() {
-  const { drizzleDb, queryClient } = useDatabase();
+  const { db, queryClient } = useDatabase();
   return useMutation({
     mutationFn: async (data: Omit<TaskType, "id">) => {
-      const createTask = await drizzleDb.insert(tasks).values(data).returning();
+      const createTask = await db.insert(tasks).values(data).returning();
       return createTask;
     },
     onSuccess: () => {
@@ -52,10 +49,10 @@ export function useCreateTask() {
 //Update task mutation
 
 export const useUpdateTask = () => {
-  const { drizzleDb, queryClient } = useDatabase();
+  const { db, queryClient } = useDatabase();
   return useMutation({
     mutationFn: async ({ id, ...data }: TaskType) => {
-      const [updateTask] = await drizzleDb
+      const [updateTask] = await db
         .update(tasks)
         .set(data)
         .where(eq(tasks.id, id))
@@ -73,10 +70,10 @@ export const useUpdateTask = () => {
 //Delete task mutation
 
 export const useDeleteTask = () => {
-  const { drizzleDb, queryClient } = useDatabase();
+  const { db, queryClient } = useDatabase();
   return useMutation({
     mutationFn: async (id: number) => {
-      await drizzleDb.delete(tasks).where(eq(tasks.id, id));
+      await db.delete(tasks).where(eq(tasks.id, id));
     },
     onSuccess: () => {
       // Invalidate and refetch

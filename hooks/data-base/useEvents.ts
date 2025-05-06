@@ -6,11 +6,11 @@ import { events, lists, ListType } from "@/db/schema";
 
 //Get all events
 export function useEvents() {
-  const { drizzleDb } = useDatabase();
+  const { db } = useDatabase();
   return useQuery({
     queryKey: ["events"],
     queryFn: async () => {
-      const data = await drizzleDb.query.events.findMany({
+      const data = await db.query.events.findMany({
         with: {
           date: true,
           list: {
@@ -30,15 +30,16 @@ export function useEvents() {
 //Get date by date
 
 export function useEventByDate(date: string) {
-  const { drizzleDb } = useDatabase();
+  const { db } = useDatabase();
   return useQuery({
     queryKey: ["events", date],
     queryFn: async () => {
-      const dateEvent = await drizzleDb.query.dates.findFirst({
+      const dateEvent = await db.query.dates.findFirst({
         where: eq(dates.date, date),
       });
+
       if (!dateEvent) return;
-      const result = await drizzleDb.query.events.findMany({
+      const result = await db.query.events.findMany({
         where: eq(events.dateId, dateEvent.id),
         with: {
           list: {
@@ -48,17 +49,18 @@ export function useEventByDate(date: string) {
           },
         },
       });
+
       return result;
     },
   });
 }
 
 export function useEventByList(listId: number) {
-  const { drizzleDb } = useDatabase();
+  const { db } = useDatabase();
   return useQuery({
     queryKey: ["events", listId],
     queryFn: async () => {
-      const data = await drizzleDb.query.events.findMany({
+      const data = await db.query.events.findMany({
         where: eq(events.listId, listId),
         with: {
           date: true,
@@ -79,7 +81,7 @@ export function useEventInsertList({
   date: string;
   listId: number;
 }) {
-  const { drizzleDb, queryClient } = useDatabase();
+  const { db, queryClient } = useDatabase();
 
   const createDate = useMutation({
     mutationFn: async ({
@@ -89,7 +91,7 @@ export function useEventInsertList({
       dateId: number;
       listId: number;
     }) => {
-      await drizzleDb.insert(events).values({ listId, dateId }).returning();
+      await db.insert(events).values({ listId, dateId }).returning();
     },
     onSuccess: () => {
       // Invalidate and refetch
@@ -106,10 +108,10 @@ export function useDeleteEvent({
   date: DateType;
   listId: number;
 }) {
-  const { drizzleDb, queryClient } = useDatabase();
+  const { db, queryClient } = useDatabase();
   return useMutation({
     mutationFn: async () => {
-      await drizzleDb
+      await db
         .delete(events)
         .where(and(eq(events.dateId, date.id), eq(events.listId, listId)));
     },
