@@ -11,7 +11,6 @@ interface Props {
 
 export function ModalListChoice({ date }: Props) {
   const { data: lists } = useLists();
-
   return (
     <ModalContainer variant="withPlusIcon">
       <ChoiceList

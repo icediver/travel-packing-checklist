@@ -16,15 +16,14 @@ interface Props {
 
 export function EventLists({ list, date, checked }: Props) {
   const [isChecked, setIsChecked] = useState(checked);
-  const { mutate: addList } = useEventInsertList({
-    date: date.date,
-    listId: list.id,
-  });
+  const { mutate: addList } = useEventInsertList();
   const { mutate: deleteEvent } = useDeleteEvent({
     date,
     listId: list.id,
   });
   function onValueChange() {
+    console.log(isChecked);
+
     if (!isChecked) {
       try {
         addList({

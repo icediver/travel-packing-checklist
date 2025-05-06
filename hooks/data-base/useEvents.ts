@@ -36,9 +36,12 @@ export function useEventByDate(date: string) {
     queryFn: async () => {
       const dateEvent = await db.query.dates.findFirst({
         where: eq(dates.date, date),
+        //with: {
+        //  lists: true,
+        //},
       });
+      if (!dateEvent) throw new Error("Date not found");
 
-      if (!dateEvent) return;
       const result = await db.query.events.findMany({
         where: eq(events.dateId, dateEvent.id),
         with: {
@@ -74,13 +77,7 @@ export function useEventByList(listId: number) {
 
 //Insert List  mutation
 
-export function useEventInsertList({
-  date,
-  listId,
-}: {
-  date: string;
-  listId: number;
-}) {
+export function useEventInsertList() {
   const { db, queryClient } = useDatabase();
 
   const createDate = useMutation({
@@ -94,8 +91,13 @@ export function useEventInsertList({
       await db.insert(events).values({ listId, dateId }).returning();
     },
     onSuccess: () => {
+      console.log("Event created successfully");
+
       // Invalidate and refetch
       queryClient.invalidateQueries({ queryKey: ["events"] });
+    },
+    onError: (error) => {
+      console.error("Create event error:", error);
     },
   });
   return createDate;

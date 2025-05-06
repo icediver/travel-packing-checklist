@@ -34,19 +34,16 @@ export const eventsRelations = relations(events, ({ one, many }) => ({
     fields: [events.dateId],
     references: [dates.id],
   }),
+  completedTasks: many(completedTasks),
 }));
 
 export const completedTasksRelations = relations(completedTasks, ({ one }) => ({
+  event: one(events, {
+    fields: [completedTasks.eventId],
+    references: [events.id],
+  }),
   task: one(tasks, {
     fields: [completedTasks.taskId],
     references: [tasks.id],
-  }),
-  list: one(lists, {
-    fields: [completedTasks.listId],
-    references: [lists.id],
-  }),
-  date: one(dates, {
-    fields: [completedTasks.dateId],
-    references: [dates.id],
   }),
 }));

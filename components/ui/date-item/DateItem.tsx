@@ -8,9 +8,6 @@ interface Props {
 }
 
 export function DateItem({ date }: Props) {
-  //function onPress() {
-  //  console.log("pressed", date);
-  //}
   return (
     <View className="flex-row w-full justify-between items-center gap-8 px-2 border my-2 border-indigo-400 rounded-lg">
       <Link

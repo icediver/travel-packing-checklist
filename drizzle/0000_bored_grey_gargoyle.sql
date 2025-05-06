@@ -1,11 +1,10 @@
 CREATE TABLE `completed_tasks` (
+	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`task_id` integer NOT NULL,
-	`lsit_id` integer NOT NULL,
-	`date_id` integer NOT NULL,
-	PRIMARY KEY(`task_id`, `lsit_id`, `date_id`),
+	`event_id` integer NOT NULL,
+	`completed_at` text NOT NULL,
 	FOREIGN KEY (`task_id`) REFERENCES `tasks`(`id`) ON UPDATE no action ON DELETE no action,
-	FOREIGN KEY (`lsit_id`) REFERENCES `events`(`list_id`) ON UPDATE no action ON DELETE no action,
-	FOREIGN KEY (`date_id`) REFERENCES `events`(`date_id`) ON UPDATE no action ON DELETE no action
+	FOREIGN KEY (`event_id`) REFERENCES `events`(`id`) ON UPDATE no action ON DELETE no action
 );
 --> statement-breakpoint
 CREATE TABLE `dates` (
@@ -16,13 +15,14 @@ CREATE TABLE `dates` (
 --> statement-breakpoint
 CREATE UNIQUE INDEX `dates_date_unique` ON `dates` (`date`);--> statement-breakpoint
 CREATE TABLE `events` (
+	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`list_id` integer NOT NULL,
 	`date_id` integer NOT NULL,
-	PRIMARY KEY(`list_id`, `date_id`),
 	FOREIGN KEY (`list_id`) REFERENCES `lists`(`id`) ON UPDATE no action ON DELETE no action,
 	FOREIGN KEY (`date_id`) REFERENCES `dates`(`id`) ON UPDATE no action ON DELETE no action
 );
 --> statement-breakpoint
+CREATE UNIQUE INDEX `events_list_id_date_id_unique` ON `events` (`list_id`,`date_id`);--> statement-breakpoint
 CREATE TABLE `lists` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`name` text NOT NULL

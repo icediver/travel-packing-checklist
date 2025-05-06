@@ -6,6 +6,7 @@ import { ModalContext } from "../../modals/ModalContainer";
 import { COLORS } from "@/constants/colors.constants";
 import { EventLists } from "./event-lists/EventLists";
 import { useEventByDate } from "@/hooks/data-base/useEvents";
+import { useDateByDate } from "@/hooks/data-base/useDates";
 
 interface Props {
   lists: ListType[];
